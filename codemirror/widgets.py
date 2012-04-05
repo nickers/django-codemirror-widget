@@ -3,22 +3,21 @@
 # Created:    2010/09/09
 # Author:         alisue
 #
+import simplejson as json
 from django import forms
 from django.conf import settings
 from django.template.loader import render_to_string
-from django.contrib.staticfiles.templatetags.staticfiles import static as convert_path_to_static
 from django.contrib.admin.widgets import AdminTextareaWidget
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ImproperlyConfigured
 
+    
 # set default settings
-CODEMIRROR_DEFAULT_PARSERFILE  = getattr(settings, 'CODEMIRROR_DEFAULT_PARSERFILE', 'codemirror/js/parsedummy.js')
-CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEET', '')
-CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror/js/')
-
+CODEMIRROR_PATH  = getattr(settings, 'CODEMIRROR_PATH', 'codemirror')
 if CODEMIRROR_PATH.endswith('/'):
     CODEMIRROR_PATH = CODEMIRROR_PATH[:-1]
-
+CODEMIRROR_DEFAULT_PARSERFILE  = getattr(settings, 'CODEMIRROR_DEFAULT_PARSERFILE', 'parsedummy.js')
+CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEET', '')
 
 class CodeMirrorTextarea(forms.Textarea):
     u"""Textarea widget render with `CodeMirror`
@@ -30,7 +29,7 @@ class CodeMirrorTextarea(forms.Textarea):
     class Media:
         css = {}
         js = (
-            convert_path_to_static(CODEMIRROR_PATH + '/codemirror.js'),
+            r"%s/js/codemirror.js" % CODEMIRROR_PATH,
         )
         
     def __init__(self, attrs=None, path=None, parserfile=None, stylesheet=None, **kwargs):
@@ -43,7 +42,7 @@ class CodeMirrorTextarea(forms.Textarea):
         
         Example:
             *-------------------------------*
-            + javascript
+            + static
               + codemirror
                 + css
                   - xmlcolors.css
@@ -51,20 +50,21 @@ class CodeMirrorTextarea(forms.Textarea):
                   - codemirror.js
                   - parsexml.js
             *-------------------------------*
-            settings.CODEMIRROR_PATH = r"javascript/codemirror/js"
+            CODEMIRROR_PATH = r"codemirror"
             
             codemirror = CodeMirrorTextarea(
                 # parserfile='parsexml.js',                                # Can be written as the left when only one file is needed.
                 parserfile=['parsexml.js'],
-                # stylesheet=r'javascript/codemirror/css/xmlcolors.css'    # Can be written as the left when only one file is needed.
-                stylesheet=[r'javascript/codemirror/css/xmlcolors.css'],
+                # stylesheet=r'xmlcolors.css'    # Can be written as the left when only one file is needed.
+                stylesheet=[r'css/xmlcolors.css'],
             )
             document = forms.TextField(widget=codemirror)
         """
         super(CodeMirrorTextarea, self).__init__(attrs=attrs, **kwargs)
-        self.path = path or CODEMIRROR_PATH
+        self.path = path or settings.STATIC_URL + CODEMIRROR_PATH + '/js/'
         self.parserfile = parserfile or CODEMIRROR_DEFAULT_PARSERFILE
         self.stylesheet = stylesheet or CODEMIRROR_DEFAULT_STYLESHEET
+        self.stylesheet = [settings.STATIC_URL + CODEMIRROR_PATH + '/' + css for css in self.stylesheet]
         if not hasattr(self.parserfile, '__iter__'):
             self.parserfile = (self.parserfile,)
         if not hasattr(self.stylesheet, '__iter__'):
@@ -74,19 +74,23 @@ class CodeMirrorTextarea(forms.Textarea):
         u"""Render CodeMirrorTextarea"""
         html = super(CodeMirrorTextarea, self).render(name, value, attrs)
         kwargs = {
-            'id': "\"id_%s\""%name,
-            'path': "\"%s/\"" % convert_path_to_static(self.path),
-            'parserfile': "[%s]" % (", ".join(["\"%s\"" % convert_path_to_static(x) for x in self.parserfile])),
-            'stylesheet': "[%s]" % (", ".join(["\"%s\"" % x for x in self.stylesheet])),
+            'id': '"id_%s"' % name,
+            'path': json.dumps(self.path),
+            'parserfile': json.dumps(self.parserfile),
+            'stylesheet': json.dumps(self.stylesheet),
         }
-        if self.stylesheet == []:
-            kwargs['stylesheet'] = '""'
         for key in kwargs.keys():
             kwargs[key] = mark_safe(kwargs[key])
         code = render_to_string(r"codemirror/javascript.html", kwargs)
         body = "%s\n%s" % (html, code)
         return mark_safe(body)
-    
+     
 class AdminCodeMirrorTextareaWidget(CodeMirrorTextarea, AdminTextareaWidget):
     u"""CodeMirrorTextarea for Admin site"""
     pass
+
+class AdminHTMLEditor(AdminCodeMirrorTextareaWidget):
+    def __init__(self, *args, **kwargs):
+        kwargs['parserfile'] = ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"]
+        kwargs['stylesheet'] = ["css/xmlcolors.css", "css/jscolors.css", "css/csscolors.css"]
+        super(AdminHTMLEditor, self).__init__(*args, **kwargs)
