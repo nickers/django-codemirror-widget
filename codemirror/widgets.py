@@ -17,7 +17,7 @@ CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEE
 CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror/js/codemirror.js')
 
 if CODEMIRROR_PATH.endswith('/'):
-    CODEMIRROR_PATH = settings.CODEMIRROR_PATH[:-1]
+    CODEMIRROR_PATH = CODEMIRROR_PATH[:-1]
 
 
 class CodeMirrorTextarea(forms.Textarea):
@@ -62,9 +62,9 @@ class CodeMirrorTextarea(forms.Textarea):
             document = forms.TextField(widget=codemirror)
         """
         super(CodeMirrorTextarea, self).__init__(attrs=attrs, **kwargs)
-        self.path = path or settings.CODEMIRROR_PATH
-        self.parserfile = parserfile or settings.CODEMIRROR_DEFAULT_PARSERFILE
-        self.stylesheet = stylesheet or settings.CODEMIRROR_DEFAULT_STYLESHEET
+        self.path = path or CODEMIRROR_PATH
+        self.parserfile = parserfile or CODEMIRROR_DEFAULT_PARSERFILE
+        self.stylesheet = stylesheet or CODEMIRROR_DEFAULT_STYLESHEET
         if not hasattr(self.parserfile, '__iter__'):
             self.parserfile = (self.parserfile,)
         if not hasattr(self.stylesheet, '__iter__'):
@@ -75,7 +75,7 @@ class CodeMirrorTextarea(forms.Textarea):
         html = super(CodeMirrorTextarea, self).render(name, value, attrs)
         kwargs = {
             'id': "\"id_%s\""%name,
-            'path': "\"%s%s/\""%(settings.MEDIA_URL, self.path),
+            'path': "\"%s%s/\"" % convert_path_to_static(self.path),
             'parserfile': "[%s]" % (", ".join(["\"%s\"" % convert_path_to_static(x) for x in self.parserfile])),
             'stylesheet': "[%s]" % (", ".join(["\"%s\"" % (convert_path_to_static(x)) for x in self.stylesheet])),
         }
