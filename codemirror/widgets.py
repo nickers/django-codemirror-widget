@@ -14,7 +14,7 @@ from django.core.exceptions import ImproperlyConfigured
 # set default settings
 CODEMIRROR_DEFAULT_PARSERFILE  = getattr(settings, 'CODEMIRROR_DEFAULT_PARSERFILE', 'codemirror/js/parsedummy.js')
 CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEET', '')
-CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror/js/codemirror.js')
+CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror/js/')
 
 if CODEMIRROR_PATH.endswith('/'):
     CODEMIRROR_PATH = CODEMIRROR_PATH[:-1]
@@ -30,7 +30,7 @@ class CodeMirrorTextarea(forms.Textarea):
     class Media:
         css = {}
         js = (
-            convert_path_to_static(CODEMIRROR_PATH),
+            convert_path_to_static(CODEMIRROR_PATH + 'codemirror.js'),
         )
         
     def __init__(self, attrs=None, path=None, parserfile=None, stylesheet=None, **kwargs):
