@@ -30,6 +30,9 @@ setup(
     download_url = r"https://github.com/lambdalisue/django-codemirror-widget/tarball/master",
     license = 'BSD',
     packages = find_packages(),
+    package_dir = {
+        'codemirror': 'codemirror',
+    },
     include_package_data = True,
     zip_safe = False,
     install_requires=['setuptools'],
