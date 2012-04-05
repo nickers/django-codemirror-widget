@@ -30,7 +30,7 @@ class CodeMirrorTextarea(forms.Textarea):
     class Media:
         css = {}
         js = (
-            convert_path_to_static(CODEMIRROR_PATH + 'codemirror.js'),
+            convert_path_to_static(CODEMIRROR_PATH + '/codemirror.js'),
         )
         
     def __init__(self, attrs=None, path=None, parserfile=None, stylesheet=None, **kwargs):
