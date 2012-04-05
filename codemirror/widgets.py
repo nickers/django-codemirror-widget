@@ -6,6 +6,7 @@
 from django import forms
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.contrib.staticfiles.templatetags.staticfiles import static as convert_path_to_static
 from django.contrib.admin.widgets import AdminTextareaWidget
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ImproperlyConfigured
@@ -18,8 +19,10 @@ if settings.CODEMIRROR_PATH.endswith('/'):
     settings.CODEMIRROR_PATH = settings.CODEMIRROR_PATH[:-1]
     
 # set default settings
-settings.CODEMIRROR_DEFAULT_PARSERFILE  = getattr(settings, 'CODEMIRROR_DEFAULT_PARSERFILE', 'parsedummy.js')
-settings.CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEET', '')
+CODEMIRROR_DEFAULT_PARSERFILE  = getattr(settings, 'CODEMIRROR_DEFAULT_PARSERFILE', 'codemirror/js/parsedummy.js')
+CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEET', '')
+CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror/js/codemirror.js')
+
 
 class CodeMirrorTextarea(forms.Textarea):
     u"""Textarea widget render with `CodeMirror`
@@ -31,7 +34,7 @@ class CodeMirrorTextarea(forms.Textarea):
     class Media:
         css = {}
         js = (
-            r"%s/codemirror.js" % settings.CODEMIRROR_PATH,
+            convert_path_to_static(CODEMIRROR_PATH),
         )
         
     def __init__(self, attrs=None, path=None, parserfile=None, stylesheet=None, **kwargs):
@@ -77,8 +80,8 @@ class CodeMirrorTextarea(forms.Textarea):
         kwargs = {
             'id': "\"id_%s\""%name,
             'path': "\"%s%s/\""%(settings.MEDIA_URL, self.path),
-            'parserfile': "[%s]" % (", ".join(["\"%s\""%x for x in self.parserfile])),
-            'stylesheet': "[%s]" % (", ".join(["\"%s%s\""%(settings.MEDIA_URL,x) for x in self.stylesheet])),
+            'parserfile': "[%s]" % (", ".join(["\"%s\"" % convert_path_to_static(x) for x in self.parserfile])),
+            'stylesheet': "[%s]" % (", ".join(["\"%s\"" % (convert_path_to_static(x)) for x in self.stylesheet])),
         }
         if self.stylesheet == []:
             kwargs['stylesheet'] = '""'
