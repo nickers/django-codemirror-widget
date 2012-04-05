@@ -14,7 +14,7 @@ from django.core.exceptions import ImproperlyConfigured
 # set default settings
 CODEMIRROR_DEFAULT_PARSERFILE  = getattr(settings, 'CODEMIRROR_DEFAULT_PARSERFILE', 'codemirror/js/parsedummy.js')
 CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEET', '')
-CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror/js/')
+CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror/js/codemirror.js')
 
 if CODEMIRROR_PATH.endswith('/'):
     CODEMIRROR_PATH = CODEMIRROR_PATH[:-1]
