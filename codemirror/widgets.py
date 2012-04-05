@@ -75,7 +75,7 @@ class CodeMirrorTextarea(forms.Textarea):
         html = super(CodeMirrorTextarea, self).render(name, value, attrs)
         kwargs = {
             'id': "\"id_%s\""%name,
-            'path': "\"%s\"" % convert_path_to_static(self.path),
+            'path': "\"%s/\"" % convert_path_to_static(self.path),
             'parserfile': "[%s]" % (", ".join(["\"%s\"" % convert_path_to_static(x) for x in self.parserfile])),
             'stylesheet': "[%s]" % (", ".join(["\"%s\"" % convert_path_to_static(x) for x in self.stylesheet])),
         }
