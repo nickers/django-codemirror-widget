@@ -11,10 +11,6 @@ from django.contrib.admin.widgets import AdminTextareaWidget
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ImproperlyConfigured
 
-# check is configured correctly
-if not hasattr(settings, "CODEMIRROR_PATH"):
-    raise ImproperlyConfigured("You must define the CODEMIRROR_PATH before using the CodeMirrorTextarea.")
-
 if settings.CODEMIRROR_PATH.endswith('/'):
     settings.CODEMIRROR_PATH = settings.CODEMIRROR_PATH[:-1]
     
