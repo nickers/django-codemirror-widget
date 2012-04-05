@@ -11,13 +11,13 @@ from django.contrib.admin.widgets import AdminTextareaWidget
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ImproperlyConfigured
 
-if settings.CODEMIRROR_PATH.endswith('/'):
-    settings.CODEMIRROR_PATH = settings.CODEMIRROR_PATH[:-1]
-    
 # set default settings
 CODEMIRROR_DEFAULT_PARSERFILE  = getattr(settings, 'CODEMIRROR_DEFAULT_PARSERFILE', 'codemirror/js/parsedummy.js')
 CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEET', '')
 CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror/js/codemirror.js')
+
+if CODEMIRROR_PATH.endswith('/'):
+    CODEMIRROR_PATH = settings.CODEMIRROR_PATH[:-1]
 
 
 class CodeMirrorTextarea(forms.Textarea):
